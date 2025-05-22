@@ -8,6 +8,7 @@
 import SwiftUI
 
 struct AddExpenseView: View {
+    @Environment(\.dismiss) var dismiss
     @Environment(\.modelContext) private var modelContext
     
     var selectedCurrency: String
@@ -21,14 +22,13 @@ struct AddExpenseView: View {
     @FocusState private var isKeyboardVisible: Bool
     
     let categories: [String : String] = [
-        "Food" : "🍽️",
-        "Travel" : "🚗",
-        "Shopping" : "🛍️",
-        "Bills" : "💸",
-        "Salary" : "💼",
-        "Entertainment" : "🎮",
-        "Transport" : "🚌",
-        "Miscellaneous" : "✋"
+        "Food" : "fork.nife",
+        "Travel" : "airplane",
+        "Shopping" : "cart",
+        "Bills" : "doc.text",
+        "Salary" : "creditcard",
+        "Transport" : "truck.box.fill",
+        "Miscellaneous" : "ellipsis"
     ]
     
     init(selectedCurreny: String, expenseToEdit: Expense? = nil) {
@@ -133,9 +133,39 @@ struct AddExpenseView: View {
                     .background(LinearGradient(colors: [Color.blue.opacity(0.3), Color.purple.opacity(0.3)], startPoint: .topLeading, endPoint: .bottomTrailing))
                     .cornerRadius(25)
                     .padding(.horizontal)
+                    
+                    
+                    Button(action: saveExpense) {
+                        Text("Save")
+                            .foregroundStyle(Color.white)
+                            .font(.headline).fontWeight(.bold)
+                            .frame(maxWidth: .infinity)
+                            .padding()
+                            .background(Color.blue)
+                            .cornerRadius(10)
+                            .padding(.horizontal)
+                    }
+                    Spacer()
                 }
+                .frame(maxWidth: .infinity, alignment: .top)
             }
         }
+    }
+    
+    private func saveExpense() {
+        guard let amount = Double(amountText) else { return }
+        
+        if let expenseToEdit = expenseToEdit {
+            expenseToEdit.title = title
+            expenseToEdit.amount = amount
+            expenseToEdit.date = date
+            expenseToEdit.category = selectedCategory
+            expenseToEdit.isIncome = isIncome
+        } else {
+            let newExpense = Expense(title: title, amount: amount, date: date, category: selectedCategory, isIncome: isIncome)
+            modelContext.insert(newExpense)
+        }
+        dismiss()
     }
 }
 
